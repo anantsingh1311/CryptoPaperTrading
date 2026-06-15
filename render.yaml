@@ -1,0 +1,49 @@
+services:
+  - type: web
+    runtime: docker
+    name: anant-crypto-auth
+    rootDir: crypto-auth-service
+    region: singapore
+    plan: free
+    healthCheckPath: /actuator/health
+    autoDeployTrigger: off
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: anant-crypto-paper-db
+          property: connectionString
+      - fromGroup: anant-crypto-shared
+
+  - type: web
+    runtime: docker
+    name: anant-crypto-portfolio
+    rootDir: crypto-portfolio-service
+    region: singapore
+    plan: free
+    healthCheckPath: /actuator/health
+    autoDeployTrigger: off
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: anant-crypto-paper-db
+          property: connectionString
+      - fromGroup: anant-crypto-shared
+
+databases:
+  - name: anant-crypto-paper-db
+    databaseName: crypto_paper
+    user: crypto_paper
+    region: singapore
+    plan: free
+
+envVarGroups:
+  - name: anant-crypto-shared
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://anant-crypto-paper-trading.vercel.app
